@@ -2436,12 +2436,62 @@ class DocumentManager {
         return $html;
     }
     
-    function get_document_preview($course_info, $lp_id = false, $target = '', $session_id = 0, $add_move_button = false) {    	
-    	$course_info = api_get_course_info($course_info['code']);    	
-    	if (empty($course_info) || !is_array($course_info)) {
+    function generate_video_preview($document_data = array()) {
+        $html = '
+        <div id="jp_container_1" class="jp-video">
+			<div class="jp-type-single">
+				<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+				<div class="jp-gui">
+					<div class="jp-video-play">
+						<a href="javascript:;" class="jp-video-play-icon" tabindex="1">play</a>
+					</div>
+					<div class="jp-interface">
+						<div class="jp-progress">
+							<div class="jp-seek-bar">
+								<div class="jp-play-bar"></div>
+							</div>
+						</div>
+						<div class="jp-current-time"></div>						
+						<div class="jp-controls-holder">
+							<ul class="jp-controls">
+								<li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
+								<li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
+								<li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+								<li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>
+								<li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
+								<li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>
+							</ul>
+							<div class="jp-volume-bar">
+								<div class="jp-volume-bar-value"></div>
+							</div>
+							<ul class="jp-toggles">
+								<li><a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a></li>
+								<li><a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a></li>
+								<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>
+								<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
+							</ul>
+						</div>
+						<div class="jp-title">
+							<ul>
+								<li>'.$document_data['title'].'</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="jp-no-solution">	
+                     <span>'.get_lang('UpdateRequire').'</span>
+                    '.get_lang("ToPlayTheMediaYouWillNeedToUpdateYourBrowserToARecentVersionYouCanAlsoDownloadTheFile").'
+				</div>
+			</div>
+		</div>';
+        return $html;
+    }
+    
+    function get_document_preview($course_info, $lp_id = false, $target = '', $session_id = 0, $add_move_button = false) {    	  	
+    	if (empty($course_info['real_id']) || empty($course_info['code']) || !is_array($course_info)) {
     		return '';
-    	}    		
-    	$user_id = api_get_user_id();    	
+    	}
+    	$user_id = api_get_user_id();
     	$user_in_course = false;
         
     	if (api_is_platform_admin()) {
@@ -2498,10 +2548,10 @@ class DocumentManager {
 					"ORDER BY docs.title ASC";
     	$res_doc 	= Database::query($sql_doc);
     	$resources  = Database::store_result($res_doc, 'ASSOC');
-    	$return 	= '';
+    	
     	
     	$resources_sorted = array();
-    	    	
+        $return 	= '';    	    	
     	if ($lp_id) {
 	    	$return .= '<div class="lp_resource_element">';    	
 	    	$return .= Display::return_icon('new_doc.gif', '', array(), ICON_SIZE_SMALL);    	
@@ -2565,18 +2615,17 @@ class DocumentManager {
 
     	$new_array[$label] = array('id' => 0, 'files' => $resources_sorted);
     	
-    	$write_result = self::write_resources_tree($course_info, $session_id, $new_array, 0, $lp_id, $target, $add_move_button);
+    	$write_result = self::write_resources_tree($course_info, $session_id, $new_array, 0, $lp_id, $target, $add_move_button, true);
     	    	
     	$return .= $write_result ;
-    	
-    	$return = Display::div($return, array('class'=>'lp_resource'));    	
+    	    	
     	$img_path = api_get_path(WEB_IMG_PATH);
     	
     	if ($lp_id == false) {
     		$return .= "<script>    		
     		    	$('.doc_folder').mouseover(function() {	
-    					var my_id = this.id.split('_')[2];    						
-    					$('#'+my_id).show();
+    					var my_id = this.id.split('_')[2];
+    					$('#res_'+my_id).show();
     				});
     				
     				$('.close_div').click(function() {
@@ -2593,9 +2642,11 @@ class DocumentManager {
     		function testResources(id, img) {
 	    		if (document.getElementById(id).style.display=='block'){
 	    			document.getElementById(id).style.display='none';
+                    var id = id.split('_')[1];
 	    			document.getElementById('img_'+id).src='".$img_path."nolines_plus.gif';
 	    		} else {
 	    			document.getElementById(id).style.display='block';
+                    var id = id.split('_')[1];
     				document.getElementById('img_'+id).src='".$img_path."nolines_minus.gif';
     			}
     		}
@@ -2615,7 +2666,7 @@ class DocumentManager {
     * @param	integer Enables the tree display by shifting the new elements a certain distance to the right
     * @return	string	The HTML list
     */
-    public function write_resources_tree($course_info, $session_id, $resources_sorted, $num = 0, $lp_id = false, $target = '', $add_move_button = false) {
+    public function write_resources_tree($course_info, $session_id, $resources_sorted, $num = 0, $lp_id = false, $target = '', $add_move_button = false, $first = false) {
     	require_once api_get_path(LIBRARY_PATH).'fileDisplay.lib.php';
     	
     	$img_path 		= api_get_path(WEB_IMG_PATH);
@@ -2623,6 +2674,7 @@ class DocumentManager {
     	$web_code_path 	= api_get_path(WEB_CODE_PATH);
     	
     	$return = '';
+        
     	if (count($resources_sorted) > 0) {
     		foreach ($resources_sorted as $key => $resource) {              
     			$title = isset($resource['title']) ? $resource['title'] : null;
@@ -2664,22 +2716,23 @@ class DocumentManager {
     				    
     				$return .= '<ul class="lp_resource">';
                     
-                        $return .= '<div class="doc_folder"  id="doc_id_'.$resource['id'].'"  style="margin-left:'.($num * 18).'px; margin-right:5px;">';
+                        $return .= '<li class="doc_folder"  id="doc_id_'.$resource['id'].'"  style="margin-left:'.($num * 18).'px; ">';
+                        
                         if ($lp_id) {    				    				
                             $return .= '<img style="cursor: pointer;" src="'.$img_path.'nolines_plus.gif" align="absmiddle" id="img_' . $resource['id'] . '"  '.$onclick.' >';
                         } else {
                             $return .= '<span style="margin-left:16px">&nbsp;</span>';
                         }                      
-                        $return .= '<img alt="" src="'.$img_path.'lp_folder.gif" title="" align="absmiddle" />&nbsp;';    				
-
+                        $return .= '<img alt="" src="'.$img_path.'lp_folder.gif" title="" align="absmiddle" />&nbsp;';
                         $return .= '<span '.$onclick.' style="cursor: pointer;" >'.$title.'</span>';    				
-                        $return .= '</div>
-                                    <div style="display: none;" id="res_'.$resource['id'].'">';
-
+                        $return .= '</li>';
+                        
+                        $return .= '<div id="res_'.$resource['id'].'" style="display: none;" >';
                         if (isset($resource['files'])) {    					
                             $return .= self::write_resources_tree($course_info, $session_id, $resource['files'], $num +1, $lp_id, $target, $add_move_button);
                         }
                         $return .= '</div>';
+                        
                     $return .= '</ul>';
     			} else {
     				if (!is_array($resource)) {    				
@@ -2711,10 +2764,14 @@ class DocumentManager {
     					}
     					
     					$link = Display::url('<img alt="" src="'.$img.'" title="" />&nbsp;' . $my_file_title, $url, array('target' => $target));    					 
-    					
-                        $return .= '<li class="doc_resource lp_resource_element" data_id="'.$key.'" data_type="document" title="'.$my_file_title.'" >';
                         
-                        $return .= '<div style="margin-left:' . (($num +1) * 18) . 'px;margin-right:5px;">';
+    					if ($lp_id == false) {
+                            $return .= '<li class="doc_resource" data_id="'.$key.'" data_type="document" title="'.$my_file_title.'" >';
+                        } else {
+                            $return .= '<li class="doc_resource lp_resource_element" data_id="'.$key.'" data_type="document" title="'.$my_file_title.'" >';
+                        }
+                        
+                        $return .= '<div class="item_data" style="margin-left:' . (($num +1) * 18) . 'px;margin-right:5px;">';
                         
                         if ($add_move_button) {
                             $return .= '<a class="moved" href="#">';

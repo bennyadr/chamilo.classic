@@ -73,11 +73,9 @@ INSERT INTO settings_current (variable, subkey, type, category, selected_value, 
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES('languagePriority3', NULL, 'radio', 'Languages', 'user_selected_lang', 'LanguagePriority3Title', 'LanguagePriority3Comment', NULL, NULL, 0);
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES('languagePriority4', NULL, 'radio', 'Languages', 'platform_lang', 'LanguagePriority4Title', 'LanguagePriority4Comment', NULL, NULL, 0);
 INSERT INTO settings_options (variable, value, display_text) VALUES ('languagePriority1','platform_lang','PlatformLanguage'), ('languagePriority1','user_profil_lang','UserLanguage'), ('languagePriority1','user_selected_lang','UserSelectedLanguage'), ('languagePriority1','course_lang','CourseLanguage'), ('languagePriority2','platform_lang','PlatformLanguage'), ('languagePriority2','user_profil_lang','UserLanguage'), ('languagePriority2','user_selected_lang','UserSelectedLanguage'), ('languagePriority2','course_lang','CourseLanguage'), ('languagePriority3','platform_lang','PlatformLanguage'), ('languagePriority3','user_profil_lang','UserLanguage'), ('languagePriority3','user_selected_lang','UserSelectedLanguage'), ('languagePriority3','course_lang','CourseLanguage'), ('languagePriority4','platform_lang','PlatformLanguage'), ('languagePriority4','user_profil_lang','UserLanguage'), ('languagePriority4','user_selected_lang','UserSelectedLanguage'), ('languagePriority4','course_lang','CourseLanguage');
--- Email is login 
+-- Email is login
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('login_is_email', NULL, 'radio', 'Platform', 'false', 'LoginIsEmailTitle', 'LoginIsEmailComment', NULL, NULL, 0);
 INSERT INTO settings_options (variable, value, display_text) VALUES ('login_is_email','true','Yes'),('login_is_email','false','No') ;
--- INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('activate_send_event_by_mail', NULL, 'radio', 'Platform', 'false', 'ActivateSendEventByMailTitle', 'ActivateSendEventByMailComment', NULL, NULL, 0);
--- INSERT INTO settings_options (variable, value, display_text) VALUES ('activate_send_event_by_mail', 'true', 'Yes'),('activate_send_event_by_mail', 'false', 'No');
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES('scorm_cumulative_session_time', NULL, 'radio', 'Course', 'true', 'ScormCumulativeSessionTimeTitle', 'ScormCumulativeSessionTimeComment', NULL, NULL, 0);
 INSERT INTO settings_options (variable, value, display_text) VALUES ('scorm_cumulative_session_time','true','Yes'), ('scorm_cumulative_session_time','false','No');
 CREATE TABLE event_type ( id int unsigned NOT NULL AUTO_INCREMENT, name varchar(50) NOT NULL, name_lang_var varchar(50) NOT NULL, desc_lang_var varchar(50) NOT NULL,`extendable_variables` varchar(255) NOT NULL, PRIMARY KEY (id));
@@ -169,6 +167,14 @@ INSERT INTO settings_current (variable, subkey, type, category, selected_value, 
 INSERT INTO settings_options (variable, value, display_text) VALUES ('allow_public_certificates', 'true', 'Yes');
 INSERT INTO settings_options (variable, value, display_text) VALUES ('allow_public_certificates', 'false', 'No');
 
+INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('enable_iframe_inclusion', NULL, 'radio', 'Editor', 'false', 'EnableIframeInclusionTitle', 'EnableIframeInclusionComment', NULL, NULL, 1);
+INSERT INTO settings_options (variable, value, display_text) VALUES ('enable_iframe_inclusion', 'true', 'Yes');
+INSERT INTO settings_options (variable, value, display_text) VALUES ('enable_iframe_inclusion', 'false', 'No');
+
+INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('show_hot_courses', NULL, 'radio', 'Platform', 'true', 'ShowHotCoursesTitle', 'ShowHotCoursesComment', NULL, NULL, 1);
+INSERT INTO settings_options (variable, value, display_text) VALUES ('show_hot_courses', 'true', 'Yes');
+INSERT INTO settings_options (variable, value, display_text) VALUES ('show_hot_courses', 'false', 'No');
+
 
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('gradebook_default_weight', NULL, 'textfield', 'Gradebook', '100', 'GradebookDefaultWeightTitle', 'GradebookDefaultWeightComment', NULL, NULL, 1);
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('gradebook_default_grade_model_id', NULL, 'select', 'Gradebook', '', 'GradebookDefaultGradeModelTitle', 'GradebookDefaultGradeModelComment', NULL, NULL, 1);
@@ -212,6 +218,15 @@ INSERT INTO settings_options(variable,value,display_text) VALUES ('page_after_lo
 
 ALTER TABLE settings_current ADD COLUMN access_url_locked INTEGER NOT NULL DEFAULT 0;
 
+-- Event mail
+
+CREATE TABLE event_email_template (  id int(11) NOT NULL AUTO_INCREMENT,  message text,  subject varchar(255) DEFAULT NULL,  event_type_name varchar(255) DEFAULT NULL,  activated tinyint(4) NOT NULL DEFAULT '0',  language_id int(11) DEFAULT NULL,  PRIMARY KEY (id));
+ALTER TABLE event_email_template ADD INDEX event_name_index (event_type_name);
+CREATE TABLE event_sent (  id int(11) NOT NULL AUTO_INCREMENT,  user_from int(11) NOT NULL,  user_to int(11) DEFAULT NULL,  event_type_name varchar(100) DEFAULT NULL,  PRIMARY KEY (`id`));ALTER TABLE event_sent ADD INDEX event_name_index (event_type_name);
+CREATE TABLE user_rel_event_type (  id int(11) NOT NULL AUTO_INCREMENT,  user_id int(11) NOT NULL,  event_type_name varchar(255) NOT NULL,  PRIMARY KEY (`id`));ALTER TABLE user_rel_event_type ADD INDEX event_name_index (event_type_name);
+INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('activate_email_template', NULL, 'radio', 'Platform', 'false', 'ActivateEmailTemplateTitle', 'ActivateEmailTemplateComment', NULL, NULL, 0);
+INSERT INTO settings_options (variable, value, display_text) VALUES ('activate_email_template', 'true', 'Yes'),('activate_email_template', 'false', 'No');
+
 -- Skills
 
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('allow_skills_tool', NULL, 'radio', 'Platform', 'false', 'AllowSkillsToolTitle', 'AllowSkillsToolComment', NULL, NULL, 1);
@@ -236,8 +251,17 @@ DELETE FROM settings_options WHERE variable = 'use_document_title';
 ALTER TABLE course MODIFY COLUMN disk_quota bigint unsigned DEFAULT NULL;
 ALTER TABLE user MODIFY COLUMN username VARCHAR(100) NOT NULL;
 
+UPDATE language SET english_name = 'basque' , dokeos_folder = 'basque' where english_name = 'euskera';
+UPDATE language SET english_name = 'turkish', dokeos_folder = 'turkish' where english_name = 'turkce';
+
+INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES('platform_unsubscribe_allowed', NULL, 'radio', 'Platform', 'false', 'PlatformUnsubscribeTitle', 'PlatformUnsubscribeComment', NULL, NULL, 1);
+INSERT INTO settings_options (variable, value, display_text) values ('platform_unsubscribe_allowed', 'true', 'Yes');
+INSERT INTO settings_options (variable, value, display_text) values ('platform_unsubscribe_allowed', 'false', 'No');
+
+DROP TABLE IF EXISTS access_url_rel_session;
+
 -- Do not move this query
-UPDATE settings_current SET selected_value = '1.9.0.18042' WHERE variable = 'chamilo_database_version';
+UPDATE settings_current SET selected_value = '1.9.0.18163' WHERE variable = 'chamilo_database_version';
 
 -- xxSTATSxx
 ALTER TABLE track_e_exercices ADD COLUMN questions_to_check TEXT NOT NULL DEFAULT '';

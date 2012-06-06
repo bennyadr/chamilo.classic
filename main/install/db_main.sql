@@ -388,7 +388,7 @@ INSERT INTO language (original_name, english_name, isocode, dokeos_folder, avail
 ('English','english','en','english',1),
 ('Espa&ntilde;ol','spanish','es','spanish',1),
 ('Esperanto','esperanto','eo','esperanto',0),
-('Euskara','euskera','eu','euskera',0),
+('Euskara','basque','eu','basque',0),
 ('&#1601;&#1575;&#1585;&#1587;&#1740;','persian','fa','persian',0),
 ('Fran&ccedil;ais','french','fr','french',1),
 ('Furlan','friulian','fur','friulian',0),
@@ -423,7 +423,7 @@ INSERT INTO language (original_name, english_name, isocode, dokeos_folder, avail
 ('Suomi','finnish','fi','finnish',0),
 ('Svenska','swedish','sv','swedish',0),
 ('&#3652;&#3607;&#3618;','thai','th','thai',0),
-('T&uuml;rk&ccedil;e','turkce','tr','turkce',0),
+('T&uuml;rk&ccedil;e','turkish','tr','turkish',0),
 ('&#1059;&#1082;&#1088;&#1072;&#1111;&#1085;&#1089;&#1100;&#1082;&#1072;','ukrainian','uk','ukrainian',0),
 ('Ti&#7871;ng Vi&#7879;t','vietnamese','vi','vietnamese',0),
 ('Kiswahili','swahili','sw','swahili',0),
@@ -499,7 +499,7 @@ CREATE TABLE IF NOT EXISTS session_rel_course_rel_user (
   id_user int unsigned NOT NULL default '0',
   visibility int NOT NULL default 1,
   status int NOT NULL default 0,
-  legal_agreement INTEGER DEFAULT 0, 
+  legal_agreement INTEGER DEFAULT 0,
   PRIMARY KEY  (id_session,course_code,id_user),
   KEY id_user (id_user),
   KEY course_code (course_code)
@@ -865,7 +865,12 @@ VALUES
 ('allow_skills_tool', NULL, 'radio', 'Platform', 'false', 'AllowSkillsToolTitle', 'AllowSkillsToolComment', NULL, NULL, 1),
 ('allow_public_certificates', NULL, 'radio', 'Course', 'false', 'AllowPublicCertificatesTitle', 'AllowPublicCertificatesComment', NULL, NULL, 1),
 ('enable_enable_webcam_clip',NULL,'radio','Tools','false','EnableWebCamClipTitle','EnableWebCamClipComment',NULL,NULL, 0),
-('chamilo_database_version',NULL,'textfield',NULL, '1.9.0.18043','DatabaseVersion','', NULL, NULL, 0);
+('platform_unsubscribe_allowed', NULL, 'radio', 'Platform', 'false', 'PlatformUnsubscribeTitle', 'PlatformUnsubscribeComment', NULL, NULL, 1),
+('activate_email_template', NULL, 'radio', 'Platform', 'false', 'ActivateEmailTemplateTitle', 'ActivateEmailTemplateComment', NULL, NULL, 0),
+('enable_iframe_inclusion', NULL, 'radio', 'Editor', 'false', 'EnableIframeInclusionTitle', 'EnableIframeInclusionComment', NULL, NULL, 1),
+('show_hot_courses', NULL, 'radio', 'Platform', 'true', 'ShowHotCoursesTitle', 'ShowHotCoursesComment', NULL, NULL, 1),
+('chamilo_database_version', NULL, 'textfield',NULL, '1.9.0.18163','DatabaseVersion','', NULL, NULL, 0);
+
 
 /*
 ('show_tabs', 'custom_tab_1', 'checkbox', 'Platform', 'true', 'ShowTabsTitle', 'ShowTabsComment', NULL, 'TabsCustom1', 1),
@@ -877,9 +882,6 @@ VALUES
 ('custom_tab_2_url', NULL, 'textfield', 'Platform', '', 'CustomTab2URLTitle', 'CustomTab2URLComment', NULL, NULL, 0),
 ('custom_tab_3_name', NULL, 'textfield', 'Platform', '', 'CustomTab3NameTitle', 'CustomTab3NameComment', NULL, NULL, 0),
 ('custom_tab_3_url', NULL, 'textfield', 'Platform', '', 'CustomTab3URLTitle', 'CustomTab3URLComment', NULL, NULL, 0),
-('activate_send_event_by_mail', NULL, 'radio', 'Platform', 'false', 'ActivateSendEventByMailTitle', 'ActivateSendEventByMailComment', NULL, NULL, 0),
-('use_custom_pages',NULL,'radio','Platform','false','UseCustomPages','useCustomPagesComment','platform',NULL,0),
-('activate_send_event_by_mail', NULL, 'radio', 'Platform', 'false', 'ActivateSendEventByMailTitle', 'ActivateSendEventByMailComment', NULL, NULL, 0),
 */
 UNLOCK TABLES;
 /*!40000 ALTER TABLE settings_current ENABLE KEYS */;
@@ -1167,7 +1169,7 @@ VALUES
 ('allow_users_to_change_email_with_no_password', 'true', 'Yes'),
 ('allow_users_to_change_email_with_no_password', 'false', 'No'),
 ('show_admin_toolbar', 'do_not_show', 'DoNotShow'),
-('show_admin_toolbar', 'show_to_admin', 'ShowToAdminsOnly'), 
+('show_admin_toolbar', 'show_to_admin', 'ShowToAdminsOnly'),
 ('show_admin_toolbar', 'show_to_admin_and_teachers', 'ShowToAdminsAndTeachers'),
 ('show_admin_toolbar', 'show_to_all', 'ShowToAllUsers'),
 ('use_custom_pages','true','Yes'),
@@ -1215,13 +1217,17 @@ VALUES
 ('allow_public_certificates', 'true', 'Yes'),
 ('allow_public_certificates', 'false', 'No'),
 ('enable_webcam_clip', 'true', 'Yes'),
-('enable_webcam_clip', 'false', 'No');
+('enable_webcam_clip', 'false', 'No'),
+('platform_unsubscribe_allowed', 'true', 'Yes'),
+('platform_unsubscribe_allowed', 'false', 'No'),
+('activate_email_template', 'true', 'Yes'),
+('activate_email_template', 'false', 'No'),
+ ('enable_iframe_inclusion', 'true', 'Yes'),
+('enable_iframe_inclusion', 'false', 'No'),
+('show_hot_courses', 'true', 'Yes'),
+('show_hot_courses', 'false', 'No');
 
 UNLOCK TABLES;
-/*
-('activate_send_event_by_mail', 'true', 'Yes'),
-('activate_send_event_by_mail', 'false', 'No'),
-*/
 
 /*!40000 ALTER TABLE settings_options ENABLE KEYS */;
 
@@ -1534,19 +1540,14 @@ ALTER TABLE access_url_rel_user ADD INDEX idx_access_url_rel_user_user (user_id)
 ALTER TABLE access_url_rel_user ADD INDEX idx_access_url_rel_user_access_url(access_url_id);
 ALTER TABLE access_url_rel_user ADD INDEX idx_access_url_rel_user_access_url_user (user_id,access_url_id);
 
+-- Adding admin to the first portal
+INSERT INTO access_url_rel_user VALUES(1, 1);
+
 DROP TABLE IF EXISTS access_url_rel_course;
 CREATE TABLE IF NOT EXISTS access_url_rel_course (
   access_url_id int unsigned NOT NULL,
   course_code char(40) NOT NULL,
   PRIMARY KEY (access_url_id, course_code)
-);
-
-
-DROP TABLE IF EXISTS access_url_rel_session;
-CREATE TABLE IF NOT EXISTS access_url_rel_session (
-  access_url_id int unsigned NOT NULL,
-  session_id int unsigned NOT NULL,
-  PRIMARY KEY (access_url_id, session_id)
 );
 
 --
@@ -2871,7 +2872,7 @@ CREATE TABLE IF NOT EXISTS skill_rel_user (
   user_id int NOT NULL,
   skill_id int NOT NULL,
   acquired_skill_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  assigned_by int NOT NULL, 
+  assigned_by int NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -2894,27 +2895,36 @@ CREATE TABLE IF NOT EXISTS skill_rel_profile (
 --
 -- Table structure for event email sending
 --
-DROP TABLE IF EXISTS event_type;
-CREATE TABLE IF NOT EXISTS event_type (
-  id smallint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  name_lang_var varchar(50) NOT NULL,
-  desc_lang_var varchar(50) NOT NULL,
-  extendable_variables varchar(255) NOT NULL,
+DROP TABLE IF EXISTS event_email_template;
+CREATE TABLE event_email_template (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  message text,
+  subject varchar(255) DEFAULT NULL,
+  event_type_name varchar(255) DEFAULT NULL,
+  activated tinyint(4) NOT NULL DEFAULT '0',
+  language_id int(11) DEFAULT NULL,
   PRIMARY KEY (id)
 );
-ALTER TABLE event_type ADD INDEX ( name );
+ALTER TABLE event_email_template ADD INDEX event_name_index (event_type_name);
 
-DROP TABLE IF EXISTS event_type_email_template;
-CREATE TABLE IF NOT EXISTS event_type_email_template (
-  id int unsigned NOT NULL AUTO_INCREMENT,
-  event_type_id int unsigned NOT NULL,
-  language_id smallint unsigned NOT NULL,
-  message text NOT NULL,
-  subject varchar(255) NOT NULL,
-  PRIMARY KEY (id)
+DROP TABLE IF EXISTS event_sent;
+CREATE TABLE event_sent (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  user_from int(11) NOT NULL,
+  user_to int(11) DEFAULT NULL,
+  event_type_name varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 );
-ALTER TABLE event_type_email_template ADD INDEX ( language_id );
+ALTER TABLE event_sent ADD INDEX event_name_index (event_type_name);
+
+DROP TABLE IF EXISTS user_rel_event_type;
+CREATE TABLE user_rel_event_type (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  user_id int(11) NOT NULL,
+  event_type_name varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+ALTER TABLE user_rel_event_type ADD INDEX event_name_index (event_type_name);
 
 --
 -- Table structure for LP custom storage API
@@ -2950,7 +2960,7 @@ CREATE TABLE IF NOT EXISTS track_course_ranking (
  id   int unsigned not null PRIMARY KEY AUTO_INCREMENT,
  c_id  int unsigned not null,
  session_id  int unsigned not null default 0,
- url_id  int unsigned not null default 0, 
+ url_id  int unsigned not null default 0,
  accesses int unsigned not null default 0,
  total_score int unsigned not null default 0,
  users int unsigned not null default 0,
@@ -2966,7 +2976,7 @@ DROP TABLE IF EXISTS user_rel_course_vote;
 CREATE TABLE IF NOT EXISTS user_rel_course_vote (
   id int unsigned not null AUTO_INCREMENT PRIMARY KEY,
   c_id int unsigned not null,
-  user_id int unsigned not null,  
+  user_id int unsigned not null,
   session_id int unsigned not null default 0,
   url_id int unsigned not null default 0,
   vote int unsigned not null default 0
@@ -2985,7 +2995,7 @@ CREATE TABLE IF NOT EXISTS chat (
 	message		TEXT NOT NULL,
 	sent		DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
 	recd		INTEGER UNSIGNED NOT NULL DEFAULT 0,
-	PRIMARY KEY (id)	
+	PRIMARY KEY (id)
 );
 
 ALTER TABLE chat ADD INDEX idx_chat_to_user (to_user);

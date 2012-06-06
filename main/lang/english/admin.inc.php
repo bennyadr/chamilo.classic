@@ -3,6 +3,12 @@
 for more information: see languages.txt in the lang folder.
 */
 $CasMainActivateComment = "Enabling CAS authentication will allow users to authenticate with their CAS credentials.<br/>Go to <a href='settings.php?category=CAS'>Plugin</a> to add a configurable 'CAS Login' button for your Chamilo campus.";
+$MailTemplateRegistrationMessage = "Dear ((firstname)) ((lastname)),\n\nYou are registered on
+((sitename)) with the following settings:\n\nUsername :
+((username))\nPass : ((password))\n\nThe address of ((sitename)) is :
+((url))\n\nIn case of trouble, contact us.\n\nYours sincerely
+\n((admin_name)) ((admin_surname)).";
+$MailTemplateRegistrationTitle = "New user on ((sitename))";
 $AdminBy = "Administration by";
 $AdministrationTools = "Administration";
 $State = "Portal status";
@@ -502,7 +508,7 @@ $AfterApproval = "After approval";
 $StudentViewEnabledTitle = "Enable learner view";
 $StudentViewEnabledComment = "Enable the user view, which allows a trainer or admin to see a training as a participant or user would see it";
 $TimeLimitWhosonlineTitle = "Time limit on Who Is Online";
-$TimeLimitWhosonlineComment = "This time limit defines for how many seconds after his last action a user will be considered *online*";
+$TimeLimitWhosonlineComment = "This time limit defines for how many minutes after his last action a user will be considered *online*";
 $ExampleMaterialCourseCreationTitle = "Example material on course creation";
 $ExampleMaterialCourseCreationComment = "Create example material automatically when creating a new course";
 $AccountValidDurationTitle = "Account validity";
@@ -1059,6 +1065,8 @@ $EditTopRegister = "Edit Note";
 $InsertTabs = "Add Tabs";
 $EditTabs = "Edit Tabs";
 $YourGradebookFirstNeedsACertificateInOrderToBeLinkedToASkill = "Your gradebook first needs a certificate in order to be linked to a skill";
+$PlatformUnsubscribeTitle = "Allow unsubscription from platform";
+$PlatformUnsubscribeComment = "By enabling this option, you allow any user to definitively remove his own account and all data related to it from the platform. This is quite a radical action, but it is necessary for portals opened to the public where users can auto-register. An additional entry will appear in the user profile to unsubscribe after confirmation.";
 $BabyOrange = "Baby Orange";
 $BlueLagoon = "Blue lagoon";
 $CoolBlue = "Cool blue";
@@ -1569,4 +1577,7 @@ $GradebookEnableGradeModelComment = "Enables the auto creation of gradebook cate
 $AllowSessionAdminsToSeeAllSessionsTitle = "Allow session administrators to see all sessions";
 $AllowSessionAdminsToSeeAllSessionsComment = "When this option is not enabled (default), session administrators can only see the sessions they have created. This is confusing in an open environment where session administrators might need to share support time between two sessions.";
 $AllowSkillsToolTitle = "Allow Skills tool";
+$AllowSkillsToolComment = "Users can see their skills in the social network and in a block in the homepage.";
+$AllowPublicCertificatesTitle = "Allow public certificates";
+$AllowPublicCertificatesComment = "User certificates can be view by unregistered users.";
 ?>

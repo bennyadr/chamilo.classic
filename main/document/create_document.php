@@ -22,22 +22,22 @@ $htmlHeadXtra[] = '
 <script>
 
 var hide_bar = function() {    
-    $("#main_content .span3").hide(); 
+    $("#template_col").hide(); 
     $("#doc_form").removeClass("span9"); 
     $("#doc_form").addClass("span11");   
     $("#hide_bar_template").css({"background-image" : \'url("../img/hide2.png")\'})
 }
 
-$(document).ready(function() {    
+$(document).ready(function() {
+    if ($(window).width() <= 785 ) {
+        hide_bar();      
+    }
     $("#hide_bar_template").toggle(
         function() { 
-            $("#main_content .span3").hide(); 
-            $("#doc_form").removeClass("span9"); 
-            $("#doc_form").addClass("span11");             
-            $(this).css({"background-image" : \'url("../img/hide2.png")\'})
+          hide_bar();
         },
         function() { 
-            $("#main_content .span3").show(); 
+            $("#template_col").show(); 
             $("#doc_form").removeClass("span11"); 
             $("#doc_form").addClass("span9"); 
             $(this).css("background-image", \'url("../img/hide0.png")\'); 
@@ -594,10 +594,10 @@ if ($form->validate()) {
 	}    
     // HTML-editor
     echo '<div class="row-fluid" style="overflow:hidden">
-            <div class="span3">
-                    <div id="frmModel" style="overflow: visible;"></div>
+            <div id="template_col" class="span2" style="width:162px">
+                <div id="frmModel" style="overflow: visible;"></div>
             </div>
-            <div id="hide_bar_template" class="span1"></div>
+            <div id="hide_bar_template"></div>
             <div id="doc_form" class="span9">
                     '.$form->return_form().'
             </div>

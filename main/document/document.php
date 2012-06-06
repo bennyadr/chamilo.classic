@@ -36,7 +36,6 @@ require_once '../inc/global.inc.php';
 $current_course_tool = TOOL_DOCUMENT;
 $this_section = SECTION_COURSES;
 
-
 require_once 'document.inc.php';
 $lib_path = api_get_path(LIBRARY_PATH);
 
@@ -133,7 +132,7 @@ if (api_get_group_id()) {
 
 //Actions
 
-$document_id = intval($_REQUEST['id']);
+$document_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 $message = '';
@@ -272,9 +271,9 @@ if (isset($document_id) && empty($action)) {
         $curdirpath = Security::remove_XSS($_POST['curdirpath']);
     } else {
         $curdirpath = '/';
-    }
+    }    
 
-    $curdirpathurl = urlencode($curdirpath);
+    $curdirpathurl = urlencode($curdirpath);    
 } else {
     // What's the current path?
     // We will verify this a bit further down
@@ -286,6 +285,7 @@ if (isset($document_id) && empty($action)) {
         $curdirpath = '/';
     }
 
+	
     $curdirpathurl = urlencode($curdirpath);
 
     // Check the path
@@ -476,7 +476,7 @@ $mediaplayer_path = api_get_path(WEB_LIBRARY_PATH) . 'mediaplayer/player.swf';
  */
 $docs_and_folders = DocumentManager::get_all_document_data($_course, $curdirpath, $to_group_id, null, $is_allowed_to_edit || $group_member_with_upload_rights, false);
 
-$file_list = $format_list = '';
+$format_list = '';
 $count = 1;
 
 if (!empty($docs_and_folders))
