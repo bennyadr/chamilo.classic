@@ -17,7 +17,6 @@
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('filter_terms', NULL, 'textarea', 'Security', '', 'FilterTermsTitle', 'FilterTermsComment', NULL, NULL, 0);
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('header_extra_content', NULL, 'textarea', 'Tracking', '', 'HeaderExtraContentTitle', 'HeaderExtraContentComment', NULL, NULL, 1),('footer_extra_content', NULL, 'textarea', 'Tracking', '', 'FooterExtraContentTitle', 'FooterExtraContentComment', NULL, NULL,1);
 
-ALTER TABLE personal_agenda ADD COLUMN all_day INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE sys_calendar ADD COLUMN all_day INTEGER NOT NULL DEFAULT 0;
 
 INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('show_documents_preview', NULL, 'radio', 'Tools', 'false', 'ShowDocumentPreviewTitle', 'ShowDocumentPreviewComment', NULL, NULL, 1);
@@ -212,8 +211,6 @@ ALTER TABLE user_rel_course_vote ADD INDEX idx_ucv_cid (c_id);
 ALTER TABLE user_rel_course_vote ADD INDEX idx_ucv_uid (user_id);
 ALTER TABLE user_rel_course_vote ADD INDEX idx_ucv_cuid (user_id, c_id);
 
-ALTER TABLE track_e_default  MODIFY COLUMN default_value TEXT;
-
 --User chat status
 INSERT INTO user_field (field_type, field_variable, field_display_text, field_visible, field_changeable) VALUES (1, 'user_chat_status','User chat status', 0, 0);
 UPDATE settings_current SET selected_value = 'true' WHERE variable = 'more_buttons_maximized_mode';
@@ -305,6 +302,7 @@ ALTER TABLE user_api_key ADD COLUMN description text DEFAULT NULL;
 UPDATE settings_current SET selected_value = '1.9.0.18407' WHERE variable = 'chamilo_database_version';
 
 -- xxSTATSxx
+ALTER TABLE track_e_default  MODIFY COLUMN default_value TEXT;
 ALTER TABLE track_e_exercices ADD COLUMN questions_to_check TEXT NOT NULL DEFAULT '';
 --CREATE TABLE track_filtered_terms (id int, user_id int, course_id int, session_id int, tool_id char(12), filtered_term varchar(255), created_at datetime);
 CREATE TABLE track_stored_values (id int unsigned not null AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, sco_id INT NOT NULL, course_id CHAR(40) NOT NULL, sv_key CHAR(64) NOT NULL, sv_value TEXT NOT NULL);
@@ -325,8 +323,11 @@ ALTER TABLE track_e_hotpotatoes ADD COLUMN id INTEGER NOT NULL AUTO_INCREMENT, A
 CREATE TABLE track_e_attempt_coeff ( id int unsigned not null auto_increment primary key, attempt_id INT NOT NULL, marks_coeff float(6,2));
 
 -- xxUSERxx
+ALTER TABLE personal_agenda ADD COLUMN all_day INTEGER NOT NULL DEFAULT 0;
 
 -- xxCOURSExx
+CREATE TABLE IF NOT EXISTS metadata (c_id INT NOT NULL, eid VARCHAR(250) NOT NULL, mdxmltext TEXT default '', md5 CHAR(32) default '', htmlcache1 TEXT default '', htmlcache2 TEXT default '', indexabletext TEXT default '', PRIMARY KEY (c_id, eid))
+
 ALTER TABLE lp ADD COLUMN hide_toc_frame INT NOT NULL DEFAULT 0;
 ALTER TABLE lp ADD COLUMN seriousgame_mode INT NOT NULL DEFAULT 0;
 ALTER TABLE lp_item_view modify column suspend_data longtext;

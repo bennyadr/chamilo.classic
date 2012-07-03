@@ -144,7 +144,6 @@ ALTER TABLE track_e_attempt CHANGE marks marks FLOAT( 6, 2 ) NOT NULL DEFAULT 0;
 
 -- xxCOURSExx
 ALTER TABLE course_setting ADD INDEX unique_setting (variable,subkey,category);
-ALTER TABLE lp ADD theme varchar(255) not null default '';
 ALTER TABLE survey ADD mail_subject VARCHAR( 255 ) NOT NULL AFTER reminder_mail ;
 ALTER TABLE quiz_rel_question ADD question_order mediumint unsigned NOT NULL default 1;
 ALTER TABLE quiz ADD max_attempt int NOT NULL default 0;
@@ -164,7 +163,6 @@ ALTER TABLE survey ADD form_fields TEXT NOT NULL;
 ALTER TABLE quiz_answer CHANGE hotspot_type hotspot_type ENUM( 'square', 'circle', 'poly', 'delineation' ) NULL DEFAULT NULL;
 ALTER TABLE quiz ADD start_time datetime NOT NULL default '0000-00-00 00:00:00';
 ALTER TABLE quiz ADD end_time datetime NOT NULL default '0000-00-00 00:00:00';
-ALTER TABLE quiz ADD max_attempt int NOT NULL default 0;
 ALTER TABLE forum_forum ADD forum_image varchar(255) NOT NULL default '';
 ALTER TABLE lp ADD preview_image varchar(255) NOT NULL default '';
 ALTER TABLE lp ADD author varchar(255) NOT NULL default '';
@@ -225,7 +223,6 @@ INSERT INTO tool(name,link,image,visibility,admin,address,added_tool,target,cate
 ALTER TABLE quiz ADD feedback_type int NOT NULL default 0;
 ALTER TABLE quiz_answer ADD destination text NOT NULL;
 CREATE TABLE glossary(glossary_id int unsigned NOT NULL auto_increment, name varchar(255) NOT NULL, description text not null, display_order int, PRIMARY KEY  (glossary_id));
-ALTER TABLE glossary ADD display_order int;
 ALTER TABLE quiz_question ADD level int UNSIGNED NOT NULL default 0;
 ALTER TABLE survey_invitation ADD COLUMN session_id SMALLINT(5) UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE quiz_answer   CHANGE ponderation ponderation float(6,2) NOT NULL DEFAULT 0;

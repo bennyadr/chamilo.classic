@@ -284,10 +284,10 @@ if (defined('SYSTEM_INSTALLATION')) {
     }    
     
     //Adding admin user in the access_url_rel_user  table
-    $sql = "SELECT user_id FROM admin WHERE user_id = 1";
+    $sql = "SELECT user_id FROM admin WHERE user_id = 1 AND access_url_id = 1";
     $result = iDatabase::query($sql);
     
-    if (Database::num_rows($result)) {
+    if (Database::num_rows($result) == 0) {
         $sql = "INSERT INTO access_url_rel_user VALUES(1, 1)";
         iDatabase::query($sql);
     }
@@ -335,7 +335,7 @@ if (defined('SYSTEM_INSTALLATION')) {
                         iDatabase::select_db($row_course['db_name']);
                     }
                     Log::notice('Course db ' . $row_course['db_name']);
-
+                    
                     // Now use the $c_q_list
                     foreach ($c_q_list as $query) {
                         if ($singleDbForm) {
@@ -441,8 +441,7 @@ if (defined('SYSTEM_INSTALLATION')) {
                             if (!empty($work_dir_created[$work_key])) {
                                 $parent_id = $work_dir_created[$work_key];                                
                                 $new_url = "work/".$dir_name.'/'.basename($work['url']);
-                                $new_url = Database::escape_string($new_url);
-                                $sql = "UPDATE $work_table SET url = '$new_url', parent_id = $parent_id, contains_file = '1' WHERE id = {$work['id']}";                                
+                                $new_url = Database::escape_string($new_url);$sql = "UPDATE $work_table SET url = '$new_url', parent_id = $parent_id, contains_file = '1' WHERE id = {$work['id']}";                                                               
                                 iDatabase::query($sql);     
                                 if (is_dir($final_dir)) {                                    
                                     rename($course_dir.'/'.$work['url'], $course_dir.'/'.$new_url);
@@ -640,7 +639,7 @@ if (defined('SYSTEM_INSTALLATION')) {
         }
     }
 } else {
-    echo 'You are not allowed here !';
+    echo 'You are not allowed here !' . __FILE__;
 }
 
 function check_work($folder_id, $work_url, $work_table, $base_work_dir) {
