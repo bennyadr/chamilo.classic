@@ -168,27 +168,26 @@ $stok = Security::get_token();
                     if (api_get_setting('show_courses_descriptions_in_catalog') == 'true') {
                         echo '<a class="ajax btn" href="'.api_get_path(WEB_CODE_PATH).'inc/ajax/course_home.ajax.php?a=show_course_information&amp;code='.$course['code'].'" title="'.$icon_title.'" class="thickbox">'.get_lang('Description').'</a>';
                     }
-
-                    // Go To Course button
-                    if (api_is_platform_admin() || (
-                            $course['visibility'] == COURSE_VISIBILITY_OPEN_WORLD || 
-                            ($course['visibility'] == COURSE_VISIBILITY_OPEN_PLATFORM && api_user_is_login()) ||
-                            in_array($course['code'], $user_coursecodes && $course['visibility'] != COURSE_VISIBILITY_CLOSED   )
-                            )
-                        ) {
+                    // Get access type for course button ("enter" or "register")
+                    $course['subscribe_allowed'] = $course['subscribe'];
+                    $access_type = CourseManager::get_access_link_by_user(api_get_user_id(),$course);
+                    $sub_btn = '';
+                    // Register button
+                    if (strcmp($access_type,'register')===0) {
+                        $sub_btn = ' <a class="btn btn-primary" href="'. api_get_self().'?action=subscribe_course&amp;sec_token='.$stok.'&amp;subscribe_course='.$course['code'].'&amp;search_term='.$search_term.'&amp;category_code='.$code.'">'.get_lang('Subscribe').'</a>';
+                    }
+                    // Go To Course button (only if admin, if course public or if student already subscribed)
+                    if (empty($sub_btn)) {
                         echo ' <a class="btn btn-primary" href="'.  api_get_course_url($course['code']).'">'.get_lang('GoToCourse').'</a>';
                     }
-                    
-                    // Subscribe button
-                    if (!api_is_anonymous()
-                            && ($course['visibility'] == COURSE_VISIBILITY_OPEN_WORLD || $course['visibility'] == COURSE_VISIBILITY_OPEN_PLATFORM)
-                            && $course['subscribe'] == SUBSCRIBE_ALLOWED
-                            && (!in_array($course['code'], $user_coursecodes) || empty($user_coursecodes))) {
-                        echo ' <a class="btn btn-primary" href="'. api_get_self().'?action=subscribe_course&amp;sec_token='.$stok.'&amp;subscribe_course='.$course['code'].'&amp;search_term='.$search_term.'&amp;category_code='.$code.'">'.get_lang('Subscribe').'</a>';
-                    }
+                    // Print register button (if any)
+                    echo $sub_btn;
 
                     // If user is already subscribed to the course
                     if (!api_is_anonymous() && in_array($course['code'], $user_coursecodes)) {
+			if ($course['unsubscribe'] == UNSUBSCRIBE_ALLOWED) {
+                            echo ' <a class="btn btn-primary" href="'. api_get_self().'?action=unsubscribe&amp;sec_token='.$stok.'&amp;unsubscribe='.$course['code'].'&amp;search_term='.$search_term.'&amp;category_code='.$code.'">'.get_lang('Unsubscribe').'</a>';
+                        }
                         echo '<br />';
                         echo '<br />';
                         echo Display::label(get_lang("AlreadyRegisteredToCourse"), "info");
